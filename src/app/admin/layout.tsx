@@ -1,78 +1,47 @@
 "use client";
-import Popup from '@/components/admin-panel/Popup';
-import ProductRow from '@/components/admin-panel/ProductRow';
-import { setLoading } from '@/redux/features/loadingSlice';
-import { UseAppDispatch } from '@/redux/hooks';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import Loader from '@/components/admin-panel/Loader';
+import Sidebar from "@/components/admin-panel/Sidebar";
 
-export interface IProduct {
-  _id: string;
-  imgSrc: string;
-  fileKey: string;
-  name: string;
-  desc: string;
-  price: string;
-  category: string;
-}
+const Layout = ({ children }: { children: React.ReactNode }) => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
-const Dashboard = () => {
-  const [products, setProducts] = useState<IProduct[]>([]);
-  const [openPopup, setOpenPopup] = useState(false);
-  const [updateTable, setUpdateTable] = useState(false);
+    useEffect(() => {
+        const storedPassword = localStorage.getItem('admin_password');
+        if (storedPassword === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
+            setIsAuthenticated(true);
+        } else {
+            const password = prompt("Enter admin password:");
+            if (password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
+                localStorage.setItem('admin_password', password);
+                setIsAuthenticated(true);
+            }
+        }
+        setIsLoading(false);
+    }, []);
 
-  const dispatch = UseAppDispatch();
-
-  const fetchProducts = async () => {
-    dispatch(setLoading(true));
-    try {
-      const res = await axios.get("/api/get_products");
-      setProducts(res.data);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      dispatch(setLoading(false));
+    if (isLoading) {
+        return <Loader />;
     }
-  };
 
-  useEffect(() => {
-    fetchProducts();
-  }, [updateTable]);
+    if (!isAuthenticated) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <p>Authentication failed. Please refresh the page to try again.</p>
+            </div>
+        );
+    }
 
-  return (
-    <div className="p-4">
-      <div className="bg-white rounded-lg p-4 shadow-md">
-        <h2 className="text-3xl mb-4">All Products</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[600px]">
-            <thead>
-              <tr className="text-gray-500 border-t border-[#ececec]">
-                <th className="py-2 px-4 text-left">SR No.</th>
-                <th className="py-2 px-4 text-left">Name</th>
-                <th className="py-2 px-4 text-left">Price</th>
-                <th className="py-2 px-4 text-left">Picture</th>
-                <th className="py-2 px-4 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product, index) => (
-                <ProductRow
-                  key={product._id}
-                  srNo={index + 1}
-                  setOpenPopup={setOpenPopup}
-                  setUpdateTable={setUpdateTable}
-                  product={product}
-                />
-              ))}
-            </tbody>
-          </table>
+    return (
+        <div className="flex h-screen">
+            <Sidebar />
+            <div className="flex-1 overflow-y-auto">
+                <div className="bg-gray-200 p-4 min-h-screen">{children}</div>
+            </div>
+            {isLoading && <Loader />}
         </div>
-      </div>
-      {openPopup && (
-        <Popup setOpenPopup={setOpenPopup} setUpdateTable={setUpdateTable} />
-      )}
-    </div>
-  )
-}
+    );
+};
 
-export default Dashboard;
+export default Layout;

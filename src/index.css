@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+body {
+  font-family: 'Poppins', sans-serif; /* Stylish font */
+}
+
+a {
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: #FD4B6B; /* Pink hover color */
+}
+
+.glassy-header {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}

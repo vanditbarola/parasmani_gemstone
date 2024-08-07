@@ -28,7 +28,7 @@ const Popup = ({ setOpenPopup, setUpdateTable }: PropsType) => {
             .put(`/api/edit_product/${productData._id}`, inputData)
             .then((res) => {
                 makeToast("Product Updated Successfully!");
-                setUpdateTable((prevState) => !prevState);
+                setUpdateTable((prevState) => !prevState); // Trigger data re-fetch
             })
             .catch((err) => console.log(err))
             .finally(() => {
@@ -93,4 +93,3 @@ const Popup = ({ setOpenPopup, setUpdateTable }: PropsType) => {
 };
 
 export default Popup;
-

@@ -1,10 +1,11 @@
+// components/admin-panel/Dashboard.tsx
 "use client"
 import Popup from '@/components/admin-panel/Popup';
 import ProductRow from '@/components/admin-panel/ProductRow';
 import { setLoading } from '@/redux/features/loadingSlice';
 import { UseAppDispatch } from '@/redux/hooks';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
 export interface IProduct {
   _id: string;
@@ -16,8 +17,8 @@ export interface IProduct {
   category: string;
 }
 
-const Dashboard = () => {
-  const [products, setProducts] = useState<IProduct[]>([]);
+const Dashboard = ({ initialProducts }: { initialProducts: IProduct[] }) => {
+  const [products, setProducts] = useState<IProduct[]>(initialProducts);
   const [openPopup, setOpenPopup] = useState(false);
   const [updateTable, setUpdateTable] = useState(false);
 
@@ -27,7 +28,7 @@ const Dashboard = () => {
     const fetchProducts = async () => {
       dispatch(setLoading(true));
       try {
-        const res = await axios.get("/api/get_products");
+        const res = await axios.get('/api/get_products');
         setProducts(res.data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -36,7 +37,10 @@ const Dashboard = () => {
       }
     };
 
-    fetchProducts();
+    if (updateTable) {
+      fetchProducts();
+      setUpdateTable(false);
+    }
   }, [updateTable, dispatch]);
 
   return (
